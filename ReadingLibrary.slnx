@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ReadingLibrary.API/ReadingLibrary.API.csproj" />
+  <Project Path="ReadingLibrary.Clients/ReadingLibrary.Clients.csproj" />
+  <Project Path="ReadingLibrary/ReadingLibrary.csproj" />
+</Solution>
