@@ -12,5 +12,5 @@ API docs (Scalar): http://localhost:8080/scalar/v1
 
 ## Stack
 
-- ASP.NET Core 10 + PostgreSQL 17
+- .NET 10 + PostgreSQL 17
 - Migrations run automatically on startup
