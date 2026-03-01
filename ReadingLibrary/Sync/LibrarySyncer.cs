@@ -41,7 +41,7 @@ public class LibrarySyncer
         var booksTask   = _api.GetBooks(ct);
         var authorsTask = _api.GetAuthors(ct);
         await Task.WhenAll(booksTask, authorsTask);
-        return (booksTask.Result, authorsTask.Result);
+        return (await booksTask, await authorsTask);
     }
 
     private async Task<int> SyncAuthorsAsync(IFreeReadingApi.Author[] apiAuthors, CancellationToken ct)

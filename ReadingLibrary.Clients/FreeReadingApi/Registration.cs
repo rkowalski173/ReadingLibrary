@@ -7,7 +7,7 @@ namespace ReadingLibrary.Clients.FreeReadingApi;
 
 public static class Registration
 {
-    public static void AddFreeReadingApi(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddFreeReadingApi(this IServiceCollection services, IConfiguration configuration)
     {
         var settings = new RefitSettings
         {
@@ -21,5 +21,7 @@ public static class Registration
 
         services.AddRefitClient<IFreeReadingApi>(settings)
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(url));
+
+        return services;
     }
 }

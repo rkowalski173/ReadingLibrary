@@ -13,7 +13,7 @@ public class AuthorsTests : IAsyncLifetime
     private readonly ApiFactory _factory;
     private readonly HttpClient _client;
 
-    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+    private static readonly JsonSerializerOptions JsonOptions = TestJsonOptions.Default;
 
     public AuthorsTests(ApiFactory factory)
     {

@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace ReadingLibrary.API.Validation;
 
-public class ValidationFilter(IServiceProvider services) : IAsyncActionFilter
+public class ValidationFilter : IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        var services = context.HttpContext.RequestServices;
+
         foreach (var argument in context.ActionArguments.Values)
         {
             if (argument is null) continue;

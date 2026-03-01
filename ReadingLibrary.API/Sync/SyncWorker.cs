@@ -11,6 +11,10 @@ public class SyncWorker(
     private readonly TimeSpan _interval =
         TimeSpan.FromMinutes(configuration.GetValue("Sync:IntervalMinutes", 60));
 
+    private readonly string _connectionString =
+        configuration.GetConnectionString("Postgres")
+        ?? throw new InvalidOperationException("Connection string 'Postgres' is not configured.");
+
     private const long SyncAdvisoryLockId = 5435341L;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,9 +41,7 @@ public class SyncWorker(
 
     private async Task SyncAsync(CancellationToken ct)
     {
-        var connectionString = configuration.GetConnectionString("Postgres");
-
-        await using var lockConn = new NpgsqlConnection(connectionString);
+        await using var lockConn = new NpgsqlConnection(_connectionString);
         await lockConn.OpenAsync(ct);
 
         await using var lockCmd = new NpgsqlCommand("SELECT pg_try_advisory_lock(@id)", lockConn);
@@ -61,7 +63,7 @@ public class SyncWorker(
         {
             await using var unlockCmd = new NpgsqlCommand("SELECT pg_advisory_unlock(@id)", lockConn);
             unlockCmd.Parameters.AddWithValue("id", SyncAdvisoryLockId);
-            await unlockCmd.ExecuteNonQueryAsync(ct);
+            await unlockCmd.ExecuteNonQueryAsync(CancellationToken.None);
         }
     }
 }

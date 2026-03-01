@@ -13,7 +13,7 @@ public record GetAuthorsRequest
 
 public class GetAuthorsRequestValidator : AbstractValidator<GetAuthorsRequest>
 {
-    private static readonly string[] ValidSortBy = AuthorsPresenter.SortBy.All;
+    private static readonly string[] ValidSortBy = AuthorPresenter.SortBy.All;
     private static readonly string[] ValidSortOrder = ["asc", "desc"];
 
     public GetAuthorsRequestValidator()

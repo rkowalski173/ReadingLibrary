@@ -3,6 +3,7 @@ using ReadingLibrary.API.Models;
 
 namespace ReadingLibrary.Tests.Unit;
 
+[UnitTest]
 public class GetAuthorsRequestValidatorTests
 {
     private readonly GetAuthorsRequestValidator _sut = new();
@@ -115,6 +116,7 @@ public class GetAuthorsRequestValidatorTests
     }
 }
 
+[UnitTest]
 public class GetBooksRequestValidatorTests
 {
     private readonly GetBooksRequestValidator _sut = new();
@@ -228,6 +230,7 @@ public class GetBooksRequestValidatorTests
     }
 }
 
+[UnitTest]
 public class GetBooksByAuthorRequestValidatorTests
 {
     private readonly GetBooksByAuthorRequestValidator _sut = new();

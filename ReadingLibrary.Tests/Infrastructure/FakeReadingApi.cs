@@ -21,6 +21,9 @@ public class FakeReadingApi : IFreeReadingApi
         if (FailingSlugs.Contains(slug))
             throw new HttpRequestException($"Simulated fetch failure for book '{slug}'");
 
-        return Task.FromResult(BookDetails[slug]);
+        if (!BookDetails.TryGetValue(slug, out var detail))
+            throw new HttpRequestException($"Book detail not found for slug '{slug}'");
+
+        return Task.FromResult(detail);
     }
 }

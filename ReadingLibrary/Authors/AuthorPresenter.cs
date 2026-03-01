@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using ReadingLibrary.Books;
 using ReadingLibrary.Contracts;
 using ReadingLibrary.Tools;
 
@@ -7,7 +6,7 @@ namespace ReadingLibrary.Authors;
 
 public record GetAuthorsQuery(SortOptions Sorting, PageOptions Paging);
 
-public class AuthorsPresenter(ReadingLibraryDbContext db)
+public class AuthorPresenter(ReadingLibraryDbContext db)
 {
     public static class SortBy
     {

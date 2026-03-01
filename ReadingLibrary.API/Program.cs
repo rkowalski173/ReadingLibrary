@@ -23,7 +23,7 @@ builder.Services.AddDbContext<ReadingLibraryDbContext>(options =>
     );
 
 builder.Services.AddScoped<BookPresenter>();
-builder.Services.AddScoped<AuthorsPresenter>();
+builder.Services.AddScoped<AuthorPresenter>();
 builder.Services.AddScoped<LibrarySyncer>();
 
 builder.Services.AddFreeReadingApi(builder.Configuration);

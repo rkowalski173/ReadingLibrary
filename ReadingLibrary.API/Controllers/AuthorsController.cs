@@ -9,13 +9,13 @@ namespace ReadingLibrary.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AuthorsController(AuthorsPresenter authors, BookPresenter books) : ControllerBase
+public class AuthorsController(AuthorPresenter authors, BookPresenter books) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<PaginatedResponse<AuthorDto>>> GetAuthors([FromQuery] GetAuthorsRequest req, CancellationToken ct)
     {
         var query = new GetAuthorsQuery(
-            new SortOptions(req.SortBy ?? AuthorsPresenter.SortBy.Name, req.SortOrder != "desc"),
+            new SortOptions(req.SortBy ?? AuthorPresenter.SortBy.Name, req.SortOrder != "desc"),
             new PageOptions(req.Page, req.PageSize));
         var (items, total) = await authors.GetAuthorsAsync(query, ct);
         return Ok(new PaginatedResponse<AuthorDto>(items, query.Paging.Page, query.Paging.PageSize, total));

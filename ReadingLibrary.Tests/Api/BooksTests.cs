@@ -13,7 +13,7 @@ public class BooksTests : IAsyncLifetime
     private readonly ApiFactory _factory;
     private readonly HttpClient _client;
 
-    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+    private static readonly JsonSerializerOptions JsonOptions = TestJsonOptions.Default;
 
     public BooksTests(ApiFactory factory)
     {
@@ -221,6 +221,7 @@ public class BooksTests : IAsyncLifetime
         // Assert
         result!.Items.Should().HaveCount(1);
         result.Items.Single().Title.Should().Be("Book C");
+        result.TotalCount.Should().Be(3);
     }
 
     [Fact]
