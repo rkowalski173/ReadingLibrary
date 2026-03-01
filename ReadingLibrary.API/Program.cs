@@ -1,27 +1,40 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ReadingLibrary;
+using ReadingLibrary.API.Models;
 using ReadingLibrary.API.Sync;
+using ReadingLibrary.API.Validation;
+using ReadingLibrary.Authors;
+using ReadingLibrary.Books;
 using ReadingLibrary.Clients.FreeReadingApi;
+using ReadingLibrary.Sync;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => options.Filters.Add<ValidationFilter>());
 builder.Services.AddOpenApi();
+
+builder.Services.AddValidatorsFromAssemblyContaining<GetBooksRequestValidator>();
 
 builder.Services.AddDbContext<ReadingLibraryDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres"), 
         b => b.MigrationsAssembly("ReadingLibrary"))
     );
 
-builder.Services.AddFreeReadingApi();
+builder.Services.AddScoped<BookPresenter>();
+builder.Services.AddScoped<AuthorsPresenter>();
+builder.Services.AddScoped<LibrarySyncer>();
+
+builder.Services.AddFreeReadingApi(builder.Configuration);
 builder.Services.AddHostedService<SyncWorker>();
+
+builder.Services.AddSingleton(TimeProvider.System);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.MapOpenApi();
+app.MapScalarApiReference();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -34,3 +47,5 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

@@ -9,6 +9,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["ReadingLibrary.API/ReadingLibrary.API.csproj", "ReadingLibrary.API/"]
 COPY ["ReadingLibrary.Clients/ReadingLibrary.Clients.csproj", "ReadingLibrary.Clients/"]
+COPY ["ReadingLibrary.Contracts/ReadingLibrary.Contracts.csproj", "ReadingLibrary.Contracts/"]
 COPY ["ReadingLibrary/ReadingLibrary.csproj", "ReadingLibrary/"]
 RUN dotnet restore "ReadingLibrary.API/ReadingLibrary.API.csproj"
 COPY . .

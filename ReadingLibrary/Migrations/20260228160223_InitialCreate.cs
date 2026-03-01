@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace ReadingLibrary.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,7 +16,8 @@ namespace ReadingLibrary.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -32,7 +34,8 @@ namespace ReadingLibrary.Migrations
                     ThumbnailUrl = table.Column<string>(type: "text", nullable: false),
                     Kind = table.Column<string>(type: "text", nullable: false),
                     Epoch = table.Column<string>(type: "text", nullable: false),
-                    Genre = table.Column<string>(type: "text", nullable: false)
+                    Genre = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,9 +67,34 @@ namespace ReadingLibrary.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Authors_Name_Id",
+                table: "Authors",
+                columns: new[] { "Name", "Id" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BookAuthor_BooksId",
                 table: "BookAuthor",
                 column: "BooksId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_Epoch",
+                table: "Books",
+                column: "Epoch");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_Genre",
+                table: "Books",
+                column: "Genre");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_Kind",
+                table: "Books",
+                column: "Kind");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_Title_Id",
+                table: "Books",
+                columns: new[] { "Title", "Id" });
         }
 
         /// <inheritdoc />
