@@ -10,14 +10,28 @@ public class GetAuthorsRequestValidatorTests
     [Fact]
     public void DefaultRequest_IsValid()
     {
-        _sut.Validate(new GetAuthorsRequest()).IsValid.Should().BeTrue();
+        // Arrange
+        var request = new GetAuthorsRequest();
+
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
+        result.IsValid.Should().BeTrue();
     }
 
     [Theory]
     [InlineData("name")]
     public void ValidSortBy_IsValid(string sortBy)
     {
-        _sut.Validate(new GetAuthorsRequest { SortBy = sortBy }).IsValid.Should().BeTrue();
+        // Arrange
+        var request = new GetAuthorsRequest { SortBy = sortBy };
+
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
+        result.IsValid.Should().BeTrue();
     }
 
     [Theory]
@@ -26,8 +40,13 @@ public class GetAuthorsRequestValidatorTests
     [InlineData("NAME")]
     public void InvalidSortBy_IsInvalid(string sortBy)
     {
-        var result = _sut.Validate(new GetAuthorsRequest { SortBy = sortBy });
+        // Arrange
+        var request = new GetAuthorsRequest { SortBy = sortBy };
 
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(GetAuthorsRequest.SortBy));
     }
@@ -37,7 +56,14 @@ public class GetAuthorsRequestValidatorTests
     [InlineData("desc")]
     public void ValidSortOrder_IsValid(string sortOrder)
     {
-        _sut.Validate(new GetAuthorsRequest { SortOrder = sortOrder }).IsValid.Should().BeTrue();
+        // Arrange
+        var request = new GetAuthorsRequest { SortOrder = sortOrder };
+
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
+        result.IsValid.Should().BeTrue();
     }
 
     [Theory]
@@ -45,8 +71,13 @@ public class GetAuthorsRequestValidatorTests
     [InlineData("ASC")]
     public void InvalidSortOrder_IsInvalid(string sortOrder)
     {
-        var result = _sut.Validate(new GetAuthorsRequest { SortOrder = sortOrder });
+        // Arrange
+        var request = new GetAuthorsRequest { SortOrder = sortOrder };
 
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(GetAuthorsRequest.SortOrder));
     }
@@ -56,8 +87,13 @@ public class GetAuthorsRequestValidatorTests
     [InlineData(-1)]
     public void InvalidPage_IsInvalid(int page)
     {
-        var result = _sut.Validate(new GetAuthorsRequest { Page = page });
+        // Arrange
+        var request = new GetAuthorsRequest { Page = page };
 
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(GetAuthorsRequest.Page));
     }
@@ -67,8 +103,13 @@ public class GetAuthorsRequestValidatorTests
     [InlineData(101)]
     public void InvalidPageSize_IsInvalid(int pageSize)
     {
-        var result = _sut.Validate(new GetAuthorsRequest { PageSize = pageSize });
+        // Arrange
+        var request = new GetAuthorsRequest { PageSize = pageSize };
 
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(GetAuthorsRequest.PageSize));
     }
@@ -81,7 +122,14 @@ public class GetBooksRequestValidatorTests
     [Fact]
     public void DefaultRequest_IsValid()
     {
-        _sut.Validate(new GetBooksRequest()).IsValid.Should().BeTrue();
+        // Arrange
+        var request = new GetBooksRequest();
+
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
+        result.IsValid.Should().BeTrue();
     }
 
     [Theory]
@@ -89,7 +137,14 @@ public class GetBooksRequestValidatorTests
     [InlineData("authorName")]
     public void ValidSortBy_IsValid(string sortBy)
     {
-        _sut.Validate(new GetBooksRequest { SortBy = sortBy }).IsValid.Should().BeTrue();
+        // Arrange
+        var request = new GetBooksRequest { SortBy = sortBy };
+
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
+        result.IsValid.Should().BeTrue();
     }
 
     [Theory]
@@ -98,8 +153,13 @@ public class GetBooksRequestValidatorTests
     [InlineData("TITLE")]
     public void InvalidSortBy_IsInvalid(string sortBy)
     {
-        var result = _sut.Validate(new GetBooksRequest { SortBy = sortBy });
+        // Arrange
+        var request = new GetBooksRequest { SortBy = sortBy };
 
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(GetBooksRequest.SortBy));
     }
@@ -109,7 +169,14 @@ public class GetBooksRequestValidatorTests
     [InlineData("desc")]
     public void ValidSortOrder_IsValid(string sortOrder)
     {
-        _sut.Validate(new GetBooksRequest { SortOrder = sortOrder }).IsValid.Should().BeTrue();
+        // Arrange
+        var request = new GetBooksRequest { SortOrder = sortOrder };
+
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
+        result.IsValid.Should().BeTrue();
     }
 
     [Theory]
@@ -117,8 +184,13 @@ public class GetBooksRequestValidatorTests
     [InlineData("DESC")]
     public void InvalidSortOrder_IsInvalid(string sortOrder)
     {
-        var result = _sut.Validate(new GetBooksRequest { SortOrder = sortOrder });
+        // Arrange
+        var request = new GetBooksRequest { SortOrder = sortOrder };
 
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(GetBooksRequest.SortOrder));
     }
@@ -128,8 +200,13 @@ public class GetBooksRequestValidatorTests
     [InlineData(-1)]
     public void InvalidPage_IsInvalid(int page)
     {
-        var result = _sut.Validate(new GetBooksRequest { Page = page });
+        // Arrange
+        var request = new GetBooksRequest { Page = page };
 
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(GetBooksRequest.Page));
     }
@@ -139,8 +216,13 @@ public class GetBooksRequestValidatorTests
     [InlineData(101)]
     public void InvalidPageSize_IsInvalid(int pageSize)
     {
-        var result = _sut.Validate(new GetBooksRequest { PageSize = pageSize });
+        // Arrange
+        var request = new GetBooksRequest { PageSize = pageSize };
 
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(GetBooksRequest.PageSize));
     }
@@ -153,7 +235,14 @@ public class GetBooksByAuthorRequestValidatorTests
     [Fact]
     public void DefaultRequest_IsValid()
     {
-        _sut.Validate(new GetBooksByAuthorRequest()).IsValid.Should().BeTrue();
+        // Arrange
+        var request = new GetBooksByAuthorRequest();
+
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
+        result.IsValid.Should().BeTrue();
     }
 
     [Theory]
@@ -161,8 +250,13 @@ public class GetBooksByAuthorRequestValidatorTests
     [InlineData(-1)]
     public void InvalidPage_IsInvalid(int page)
     {
-        var result = _sut.Validate(new GetBooksByAuthorRequest { Page = page });
+        // Arrange
+        var request = new GetBooksByAuthorRequest { Page = page };
 
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(GetBooksByAuthorRequest.Page));
     }
@@ -172,8 +266,13 @@ public class GetBooksByAuthorRequestValidatorTests
     [InlineData(101)]
     public void InvalidPageSize_IsInvalid(int pageSize)
     {
-        var result = _sut.Validate(new GetBooksByAuthorRequest { PageSize = pageSize });
+        // Arrange
+        var request = new GetBooksByAuthorRequest { PageSize = pageSize };
 
+        // Act
+        var result = _sut.Validate(request);
+
+        // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(GetBooksByAuthorRequest.PageSize));
     }
