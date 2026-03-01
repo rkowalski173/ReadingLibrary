@@ -7,6 +7,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["Directory.Packages.props", "."]
 COPY ["ReadingLibrary.API/ReadingLibrary.API.csproj", "ReadingLibrary.API/"]
 COPY ["ReadingLibrary.Clients/ReadingLibrary.Clients.csproj", "ReadingLibrary.Clients/"]
 COPY ["ReadingLibrary.Contracts/ReadingLibrary.Contracts.csproj", "ReadingLibrary.Contracts/"]

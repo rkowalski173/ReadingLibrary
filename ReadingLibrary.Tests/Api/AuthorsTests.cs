@@ -60,6 +60,7 @@ public class AuthorsTests : IAsyncLifetime
             "/authors?sortBy=name&sortOrder=asc", JsonOptions);
 
         // Assert
+        result!.Items.Should().HaveCount(3);
         result!.Items.Select(a => a.Name).Should().BeInAscendingOrder();
     }
 
@@ -79,6 +80,7 @@ public class AuthorsTests : IAsyncLifetime
             "/authors?sortBy=name&sortOrder=desc", JsonOptions);
 
         // Assert
+        result!.Items.Should().HaveCount(3);
         result!.Items.Select(a => a.Name).Should().BeInDescendingOrder();
     }
 

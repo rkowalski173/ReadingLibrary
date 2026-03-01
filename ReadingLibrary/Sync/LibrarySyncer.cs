@@ -78,23 +78,63 @@ public class LibrarySyncer
 
         var authorsByName = await LoadAuthorsByNameAsync(newBooks, ct);
 
-        var syncedCount = 0;
+        // Phase 1: try to resolve all books by name
+        var resolvedBooks = new List<(IFreeReadingApi.Book ApiBook, List<Author> Authors)>();
+        var failedBooks   = new List<IFreeReadingApi.Book>();
+
         foreach (var apiBook in newBooks)
         {
-            try
-            {
-                var book = await BuildBookAsync(apiBook, authorsByName, ct);
-                _db.Books.Add(book);
-                syncedCount++;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to sync book '{Slug}', skipping", apiBook.Slug);
-            }
+            if (TryResolveAuthorsByName(apiBook, authorsByName, out var authors))
+                resolvedBooks.Add((apiBook, authors));
+            else
+                failedBooks.Add(apiBook);
         }
 
+        // Phase 2: fetch details for failed books in parallel (max 10 concurrent)
+        using var semaphore = new SemaphoreSlim(10);
+        var detailResults = await Task.WhenAll(
+            failedBooks.Select(async b =>
+            {
+                await semaphore.WaitAsync(ct);
+                try
+                {
+                    var detail = await _api.GetBookDetail(b.Slug, ct);
+                    return (Book: b, Detail: (IFreeReadingApi.BookDetail?)detail);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to fetch details for book '{Slug}', skipping", b.Slug);
+                    return (Book: b, Detail: (IFreeReadingApi.BookDetail?)null);
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            })
+        );
+
+        // Phase 3: resolve failed books by author slug
+        var allSlugs = detailResults
+            .Where(r => r.Detail is not null)
+            .SelectMany(r => r.Detail!.Authors)
+            .Select(a => a.Slug)
+            .Distinct()
+            .ToList();
+
+        var authorsBySlug = await LoadAuthorsBySlugAsync(allSlugs, ct);
+
+        foreach (var (apiBook, detail) in detailResults.Where(r => r.Detail is not null))
+        {
+            var authors = ResolveAuthorsBySlug(apiBook.Slug, detail!.Authors, authorsBySlug);
+            resolvedBooks.Add((apiBook, authors));
+        }
+
+        // Phase 4: add all resolved books
+        foreach (var (apiBook, authors) in resolvedBooks)
+            _db.Books.Add(BuildBook(apiBook, authors));
+
         await _db.SaveChangesAsync(ct);
-        return syncedCount;
+        return resolvedBooks.Count;
     }
 
     private async Task<Dictionary<string, List<Author>>> LoadAuthorsByNameAsync(List<IFreeReadingApi.Book> books, CancellationToken ct)
@@ -111,49 +151,60 @@ public class LibrarySyncer
             .ToDictionaryAsync(x => x.Key, x => x.ToList(), ct);
     }
 
-    private async Task<Book> BuildBookAsync(IFreeReadingApi.Book apiBook, Dictionary<string, List<Author>> authorsByName, CancellationToken ct)
+    private async Task<Dictionary<string, Author>> LoadAuthorsBySlugAsync(List<string> slugs, CancellationToken ct)
     {
-        var authorNames = apiBook.Author.Split(",").Select(x => x.Trim()).ToList();
-        var authors     = await ResolveAuthorsAsync(apiBook.Slug, authorNames, authorsByName, ct);
+        if (slugs.Count == 0)
+            return [];
 
-        return new Book
-        {
-            Id           = apiBook.Slug,
-            Title        = apiBook.Title,
-            Url          = apiBook.Url,
-            ThumbnailUrl = apiBook.SimpleThumb,
-            Kind         = apiBook.Kind.ToLowerInvariant(),
-            Epoch        = apiBook.Epoch.ToLowerInvariant(),
-            Genre        = apiBook.Genre.ToLowerInvariant(),
-            Authors      = authors,
-            CreatedAt    = _timeProvider.GetUtcNow()
-        };
+        return await _db.Authors
+            .Where(a => slugs.Contains(a.Id))
+            .ToDictionaryAsync(a => a.Id, ct);
     }
 
-    private async Task<List<Author>> ResolveAuthorsAsync(string bookSlug, List<string> authorNames, Dictionary<string, List<Author>> authorsByName, CancellationToken ct)
+    private bool TryResolveAuthorsByName(IFreeReadingApi.Book apiBook, Dictionary<string, List<Author>> authorsByName, out List<Author> authors)
     {
+        var authorNames = apiBook.Author.Split(",").Select(x => x.Trim()).ToList();
         var resolved = new List<Author>();
 
         foreach (var name in authorNames)
         {
-            if (!authorsByName.TryGetValue(name, out var candidates))
+            if (!authorsByName.TryGetValue(name, out var candidates) || candidates.Count != 1)
             {
-                _logger.LogWarning("Book '{Slug}': unknown author '{Name}', skipping", bookSlug, name);
-                continue;
+                authors = [];
+                return false;
             }
+            resolved.Add(candidates[0]);
+        }
 
-            if (candidates.Count == 1)
-            {
-                resolved.Add(candidates[0]);
-                continue;
-            }
+        authors = resolved;
+        return true;
+    }
 
-            _logger.LogDebug("Book '{Slug}': ambiguous author '{Name}', fetching book details", bookSlug, name);
-            var detail     = await _api.GetBookDetail(bookSlug, ct);
-            var authorSlug = detail.Authors.First(x => x.Name == name).Slug;
-            resolved.Add(candidates.First(x => x.Id == authorSlug));
+    private List<Author> ResolveAuthorsBySlug(string bookSlug, IFreeReadingApi.BookDetailAuthor[] detailAuthors, Dictionary<string, Author> authorsBySlug)
+    {
+        var resolved = new List<Author>();
+
+        foreach (var detailAuthor in detailAuthors)
+        {
+            if (authorsBySlug.TryGetValue(detailAuthor.Slug, out var author))
+                resolved.Add(author);
+            else
+                _logger.LogWarning("Book '{Slug}': author '{AuthorSlug}' not found by slug, saving without", bookSlug, detailAuthor.Slug);
         }
 
         return resolved;
     }
+
+    private Book BuildBook(IFreeReadingApi.Book apiBook, List<Author> authors) => new()
+    {
+        Id           = apiBook.Slug,
+        Title        = apiBook.Title,
+        Url          = apiBook.Url,
+        ThumbnailUrl = apiBook.SimpleThumb,
+        Kind         = apiBook.Kind.ToLowerInvariant(),
+        Epoch        = apiBook.Epoch.ToLowerInvariant(),
+        Genre        = apiBook.Genre.ToLowerInvariant(),
+        Authors      = authors,
+        CreatedAt    = _timeProvider.GetUtcNow()
+    };
 }

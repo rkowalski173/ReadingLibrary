@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using ReadingLibrary.Tools;
 
-namespace ReadingLibrary;
+namespace ReadingLibrary.Tools;
 
 internal static class QueryableExtensions
 {

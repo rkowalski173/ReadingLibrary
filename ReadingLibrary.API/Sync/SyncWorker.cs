@@ -11,7 +11,7 @@ public class SyncWorker(
     private readonly TimeSpan _interval =
         TimeSpan.FromMinutes(configuration.GetValue("Sync:IntervalMinutes", 60));
 
-    private const long SyncAdvisoryLockId = 7483920156L;
+    private const long SyncAdvisoryLockId = 5435341L;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

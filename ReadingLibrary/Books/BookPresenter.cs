@@ -48,7 +48,6 @@ public class BookPresenter(ReadingLibraryDbContext db)
     private static IQueryable<Book> ApplySorting(IQueryable<Book> q, SortOptions sorting) =>
         sorting switch
         {
-            // For books with multiple authors, asc sorts by the alphabetically first name, desc by the last.
             { SortBy: SortBy.AuthorName, InAscendingOrder: true  } => q.OrderBy(b => b.Authors.Select(a => a.Name).Min()).ThenBy(b => b.Id),
             { SortBy: SortBy.AuthorName, InAscendingOrder: false } => q.OrderByDescending(b => b.Authors.Select(a => a.Name).Max()).ThenByDescending(b => b.Id),
             { SortBy: SortBy.Title,      InAscendingOrder: false } => q.OrderByDescending(b => b.Title).ThenByDescending(b => b.Id),
