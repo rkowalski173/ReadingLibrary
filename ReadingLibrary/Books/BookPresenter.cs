@@ -39,15 +39,16 @@ public class BookPresenter(ReadingLibraryDbContext db)
 
     private static IQueryable<Book> ApplyFilters(IQueryable<Book> q, GetBooksQuery query)
     {
-        if (query.Kind is not null)  q = q.Where(b => b.Kind == query.Kind.ToLower());
-        if (query.Genre is not null) q = q.Where(b => b.Genre == query.Genre.ToLower());
-        if (query.Epoch is not null) q = q.Where(b => b.Epoch == query.Epoch.ToLower());
+        if (query.Kind is not null)  q = q.Where(b => b.Kind == query.Kind.ToLowerInvariant());
+        if (query.Genre is not null) q = q.Where(b => b.Genre == query.Genre.ToLowerInvariant());
+        if (query.Epoch is not null) q = q.Where(b => b.Epoch == query.Epoch.ToLowerInvariant());
         return q;
     }
 
     private static IQueryable<Book> ApplySorting(IQueryable<Book> q, SortOptions sorting) =>
         sorting switch
         {
+            // For books with multiple authors, asc sorts by the alphabetically first name, desc by the last.
             { SortBy: SortBy.AuthorName, InAscendingOrder: true  } => q.OrderBy(b => b.Authors.Select(a => a.Name).Min()).ThenBy(b => b.Id),
             { SortBy: SortBy.AuthorName, InAscendingOrder: false } => q.OrderByDescending(b => b.Authors.Select(a => a.Name).Max()).ThenByDescending(b => b.Id),
             { SortBy: SortBy.Title,      InAscendingOrder: false } => q.OrderByDescending(b => b.Title).ThenByDescending(b => b.Id),

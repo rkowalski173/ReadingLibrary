@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using ReadingLibrary.Books;
 using ReadingLibrary.Contracts;
 using ReadingLibrary.Tools;
@@ -14,6 +15,9 @@ public class AuthorsPresenter(ReadingLibraryDbContext db)
 
         public static readonly string[] All = [Name];
     }
+
+    public async Task<bool> AuthorExistsAsync(string authorId, CancellationToken ct = default)
+        => await db.Authors.AnyAsync(a => a.Id == authorId, ct);
 
     public async Task<(IReadOnlyList<AuthorDto> Items, int TotalCount)> GetAuthorsAsync(
         GetAuthorsQuery query, CancellationToken ct = default)

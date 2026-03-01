@@ -98,6 +98,13 @@ public class AuthorsTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task GetAuthorBooks_NonExistentAuthor_ReturnsNotFound()
+    {
+        var response = await _client.GetAsync("/authors/nonexistent/books");
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
     public async Task GetAuthorBooks_ReturnsOnlyBooksForGivenAuthor()
     {
         await _factory.SeedAsync(db =>

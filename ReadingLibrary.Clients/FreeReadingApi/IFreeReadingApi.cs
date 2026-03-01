@@ -5,11 +5,14 @@ namespace ReadingLibrary.Clients.FreeReadingApi;
 public interface IFreeReadingApi
 {
     [Get("/books")]
-    Task<Book[]> GetBooks();
-    
+    Task<Book[]> GetBooks(CancellationToken ct = default);
+
     [Get("/authors")]
-    Task<Author[]> GetAuthors();
-    
+    Task<Author[]> GetAuthors(CancellationToken ct = default);
+
+    [Get("/books/{slug}/")]
+    Task<BookDetail> GetBookDetail(string slug, CancellationToken ct = default);
+
     public record Book(
         string Kind,
         string Title,
@@ -25,4 +28,7 @@ public interface IFreeReadingApi
         string Name,
         string Slug
     );
+
+    public record BookDetail(string Slug, BookDetailAuthor[] Authors);
+    public record BookDetailAuthor(string Slug, string Name);
 }

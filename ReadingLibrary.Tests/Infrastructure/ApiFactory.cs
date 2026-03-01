@@ -36,11 +36,14 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
             .Database.MigrateAsync();
     }
 
-    public async Task SeedAsync(Action<ReadingLibraryDbContext> seed)
+    public Task SeedAsync(Action<ReadingLibraryDbContext> seed) =>
+        SeedAsync(db => { seed(db); return Task.CompletedTask; });
+
+    public async Task SeedAsync(Func<ReadingLibraryDbContext, Task> seed)
     {
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ReadingLibraryDbContext>();
-        seed(db);
+        await seed(db);
         await db.SaveChangesAsync();
     }
 

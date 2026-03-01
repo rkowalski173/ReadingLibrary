@@ -24,6 +24,9 @@ public class AuthorsController(AuthorsPresenter authors, BookPresenter books) : 
     [HttpGet("{authorId}/books")]
     public async Task<ActionResult<PaginatedResponse<BookDto>>> GetBooksByAuthor(string authorId, [FromQuery] GetBooksByAuthorRequest req, CancellationToken ct)
     {
+        if (!await authors.AuthorExistsAsync(authorId, ct))
+            return NotFound();
+
         var query = new GetBooksByAuthorQuery(authorId, new PageOptions(req.Page, req.PageSize));
         var (items, total) = await books.GetBooksByAuthorAsync(query, ct);
         return Ok(new PaginatedResponse<BookDto>(items, query.Paging.Page, query.Paging.PageSize, total));
